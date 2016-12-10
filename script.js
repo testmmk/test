@@ -1,36 +1,45 @@
 (function(angular) {
   'use strict';
-angular.module('ngViewExample', ['ngRoute', 'ngAnimate'])
-  .config(['$routeProvider', '$locationProvider',
-    function($routeProvider, $locationProvider) {
-      $routeProvider
-        .when('/Book/:bookId', {
-          templateUrl: 'book.html',
-          controller: 'BookCtrl',
-          controllerAs: 'book'
-        })
-        .when('/Book/:bookId/ch/:chapterId', {
-          templateUrl: 'chapter.html',
-          controller: 'ChapterCtrl',
-          controllerAs: 'chapter'
-        });
+angular.module('ngRouteExample', ['ngRoute'])
 
-      $locationProvider.html5Mode(true);
-  }])
-  .controller('MainCtrl', ['$route', '$routeParams', '$location',
-    function MainCtrl($route, $routeParams, $location) {
-      this.$route = $route;
-      this.$location = $location;
-      this.$routeParams = $routeParams;
-  }])
-  .controller('BookCtrl', ['$routeParams', function BookCtrl($routeParams) {
-    this.name = 'BookCtrl';
-    this.params = $routeParams;
-  }])
-  .controller('ChapterCtrl', ['$routeParams', function ChapterCtrl($routeParams) {
-    this.name = 'ChapterCtrl';
-    this.params = $routeParams;
-  }]);
+ .controller('MainController', function($scope, $route, $routeParams, $location) {
+     $scope.$route = $route;
+     $scope.$location = $location;
+     $scope.$routeParams = $routeParams;
+ })
+
+ .controller('BookController', function($scope, $routeParams) {
+     $scope.name = 'BookController';
+     $scope.params = $routeParams;
+ })
+
+ .controller('ChapterController', function($scope, $routeParams) {
+     $scope.name = 'ChapterController';
+     $scope.params = $routeParams;
+ })
+
+.config(function($routeProvider, $locationProvider) {
+  $routeProvider
+   .when('/Book', {
+    templateUrl: 'book.html',
+    controller: 'BookController',
+    resolve: {
+      // I will cause a 1 second delay
+      delay: function($q, $timeout) {
+        var delay = $q.defer();
+        $timeout(delay.resolve, 1000);
+        return delay.promise;
+      }
+    }
+  })
+  .when('/Chapter', {
+    templateUrl: 'chapter.html',
+    controller: 'ChapterController'
+  });
+
+  // configure html5 to get links working on jsfiddle
+  //$locationProvider.html5Mode(true);
+});
 })(window.angular);
 
 /*
